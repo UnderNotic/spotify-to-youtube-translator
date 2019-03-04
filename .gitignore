@@ -1,3 +1,6 @@
+# azure vault local secrets
+local.settings.json
+
 # .net core output dirs
 bin/
 obj/
