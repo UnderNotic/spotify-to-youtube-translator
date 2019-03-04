@@ -18,4 +18,4 @@ Transform spotify playlist to youtube list of links
     }
 ```
 - run `func start`
-- call http://localhost:7071/api/HelloWorld?playlist=YourSpotifyPlaylistId
+- call http://localhost:7071/api/map?playlist=YourSpotifyPlaylistId

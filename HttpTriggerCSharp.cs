@@ -22,7 +22,7 @@ namespace SpotifyToYoutubeTranslator.Function
         private static readonly string SPOTIFY_APP_KEY = System.Environment.GetEnvironmentVariable("SPOTIFY_APP_KEY");
         private static readonly string YOUTUBE_APP_KEY = System.Environment.GetEnvironmentVariable("YOUTUBE_APP_KEY");
 
-        [FunctionName("HelloWorld")]
+        [FunctionName("map")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
