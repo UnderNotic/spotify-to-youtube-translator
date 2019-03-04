@@ -2,8 +2,8 @@
 local.settings.json
 
 
-**/bin/
-**/obj/
+bin/
+obj/
 
 # Created by https://www.gitignore.io/api/aspnetcore
 # Edit at https://www.gitignore.io/?templates=aspnetcore
