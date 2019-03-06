@@ -19,6 +19,7 @@ namespace SpotifyToYoutubeTranslator.Function
     public static class HttpTriggerCSharp
     {
         private static HttpClient _httpClient = new HttpClient();
+        private static SpotifyToken _spotifyToken;
         private static readonly string SPOTIFY_APP_KEY = System.Environment.GetEnvironmentVariable("SPOTIFY_APP_KEY");
         private static readonly string YOUTUBE_APP_KEY = System.Environment.GetEnvironmentVariable("YOUTUBE_APP_KEY");
 
@@ -60,18 +61,12 @@ namespace SpotifyToYoutubeTranslator.Function
 
         private static async Task<SpotifyItems> GetSpotifyItems(HttpRequest req, string playlist)
         {
-            var tokenHeaders = new FormUrlEncodedContent(new[]{
-                new KeyValuePair<string, string>("grant_type", "client_credentials")
-            });
-
-            var tokenRequest = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token");
-            tokenRequest.Content = tokenHeaders;
-            tokenRequest.Headers.Add("Authorization", SPOTIFY_APP_KEY);
-
-            var tokenRequestResponse = await _httpClient.SendAsync(tokenRequest);
-
-            var tokenRequestBody = await tokenRequestResponse.Content.ReadAsAsync<dynamic>();
-            var token = tokenRequestBody["access_token"].ToString();
+            if (_spotifyToken == null || _spotifyToken.ExpiryDate < DateTime.UtcNow)
+            {
+                var fullToken = await GetSpotifyAccessToken();
+                _spotifyToken = new SpotifyToken(fullToken["access_token"].ToString(), Int32.Parse(fullToken["expires_in"].ToString()));
+            }
+            var token = _spotifyToken.Token;
 
             var playlistQuery = HttpUtility.ParseQueryString(string.Empty);
             playlistQuery["fields"] = "items(track(name,artists, album(name))), next";
@@ -85,6 +80,21 @@ namespace SpotifyToYoutubeTranslator.Function
 
             var spotifyItems = await playlistRequestResponse.Content.ReadAsAsync<SpotifyItems>();
             return spotifyItems;
+        }
+
+        private static async Task<dynamic> GetSpotifyAccessToken()
+        {
+            var tokenHeaders = new FormUrlEncodedContent(new[]{
+                new KeyValuePair<string, string>("grant_type", "client_credentials")
+            });
+
+            var tokenRequest = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token");
+            tokenRequest.Content = tokenHeaders;
+            tokenRequest.Headers.Add("Authorization", SPOTIFY_APP_KEY);
+
+            var tokenRequestResponse = await _httpClient.SendAsync(tokenRequest);
+
+            return await tokenRequestResponse.Content.ReadAsAsync<dynamic>();
         }
     }
 }
