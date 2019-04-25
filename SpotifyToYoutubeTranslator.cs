@@ -16,7 +16,7 @@ using SpotifyToYoutubeTranslator.Dto;
 
 namespace SpotifyToYoutubeTranslator.Function
 {
-    public static class HttpTriggerCSharp
+    public static class SpotifyToYoutubeTranslator
     {
         private static HttpClient _httpClient = new HttpClient();
         private static SpotifyToken _spotifyToken;
