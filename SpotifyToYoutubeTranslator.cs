@@ -28,7 +28,7 @@ namespace SpotifyToYoutubeTranslator.Function
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
-            string playlist = req.Query["playlist"]; //2GK6j1Wh1NfmIPcFVXC97t
+            var playlist = req.Query["playlist"]; //2GK6j1Wh1NfmIPcFVXC97t
 
             SpotifyItems spotifyItems;
             try
