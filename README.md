@@ -4,7 +4,7 @@ Transform spotify playlist to youtube list of links
 
 ## QuickStart
 
-- setup .net core (version 2.1 >= required)
+- setup .net core (version 3.1 >= required)
 - install Azure Functions Core Tools
   https://docs.microsoft.com/pl-pl/azure/azure-functions/functions-run-local
 - add to `local.settings.json` api keys: 
