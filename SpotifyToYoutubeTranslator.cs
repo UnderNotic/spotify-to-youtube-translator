@@ -55,6 +55,9 @@ namespace SpotifyToYoutubeTranslator.Function
             var youtubeRequest = new HttpRequestMessage(HttpMethod.Get, $"https://www.googleapis.com/youtube/v3/search?q={track.Track.Artists[0].Name}-{track.Track.Name}&type=video&part=id&maxResults=1&key={YOUTUBE_APP_KEY}");
 
             var youtubeRequestResponse = await _httpClient.SendAsync(youtubeRequest);
+
+            youtubeRequestResponse.EnsureSuccessStatusCode();
+
             var youtubeItems = await youtubeRequestResponse.Content.ReadAsAsync<YoutubeItems>();
             return youtubeItems;
         }
