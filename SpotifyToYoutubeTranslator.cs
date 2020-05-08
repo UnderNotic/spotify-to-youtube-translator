@@ -37,17 +37,25 @@ namespace SpotifyToYoutubeTranslator.Function
             }
             catch (HttpRequestException ex)
             {
-                return new BadRequestObjectResult($"Cannot get playlist info from spotify - {ex.Message}");
+                return new BadRequestObjectResult($"Can NOT get playlist data from spotify - {ex.Message}");
             }
 
             var resultItems = spotifyItems.Items.Select(async track =>
             {
                 var youtubeItems = await GetYoutubeItems(track);
-
+                
                 return new ResultItem(track.Track.Name, track.Track.Artists[0].Name, track.Track.Album.Name, youtubeItems.Items[0].Id.VideoId);
             });
 
-            return (ActionResult)new OkObjectResult(await Task.WhenAll(resultItems));
+            try
+            {
+                var response = await Task.WhenAll(resultItems);
+                return (ActionResult)new OkObjectResult(response);
+            }
+            catch (HttpRequestException ex)
+            {
+                return new BadRequestObjectResult($"Can NOT get youtube links from spotify tracks - {ex.Message}");
+            }
         }
 
         private static async Task<YoutubeItems> GetYoutubeItems(SpotifyItem track)
@@ -55,7 +63,6 @@ namespace SpotifyToYoutubeTranslator.Function
             var youtubeRequest = new HttpRequestMessage(HttpMethod.Get, $"https://www.googleapis.com/youtube/v3/search?q={track.Track.Artists[0].Name}-{track.Track.Name}&type=video&part=id&maxResults=1&key={YOUTUBE_APP_KEY}");
 
             var youtubeRequestResponse = await _httpClient.SendAsync(youtubeRequest);
-
             youtubeRequestResponse.EnsureSuccessStatusCode();
 
             var youtubeItems = await youtubeRequestResponse.Content.ReadAsAsync<YoutubeItems>();
@@ -66,8 +73,8 @@ namespace SpotifyToYoutubeTranslator.Function
         {
             if (_spotifyToken == null || _spotifyToken.ExpiryDate < DateTime.UtcNow)
             {
-                var fullToken = await GetSpotifyAccessToken();
-                _spotifyToken = new SpotifyToken(fullToken["access_token"].ToString(), Int32.Parse(fullToken["expires_in"].ToString()));
+                var spotifyAccessTokenResponse = await GetSpotifyAccessToken();
+                _spotifyToken = new SpotifyToken(spotifyAccessTokenResponse["access_token"].ToString(), Int32.Parse(spotifyAccessTokenResponse["expires_in"].ToString()));
             }
             var token = _spotifyToken.Token;
 
@@ -96,6 +103,7 @@ namespace SpotifyToYoutubeTranslator.Function
             tokenRequest.Headers.Add("Authorization", SPOTIFY_APP_KEY);
 
             var tokenRequestResponse = await _httpClient.SendAsync(tokenRequest);
+            tokenRequestResponse.EnsureSuccessStatusCode();
 
             return await tokenRequestResponse.Content.ReadAsAsync<dynamic>();
         }

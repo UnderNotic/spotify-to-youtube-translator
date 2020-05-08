@@ -2,6 +2,8 @@
     "IsEncrypted": false,
     "Values": {
         "AzureWebJobsStorage": "",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+        "SPOTIFY_APP_KEY": "Basic YourSpotifyAppKey",
+        "YOUTUBE_APP_KEY": "YourYoutubeAppKey"
     }
 }
